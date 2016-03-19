@@ -4,7 +4,7 @@ import os
 from tkinter import *
 import shutil
 from tkinter.filedialog import askdirectory
-
+from random import random
 class RandoM:
 
     def __init__(self):
@@ -59,11 +59,20 @@ class RandoM:
     def countFile(self,path):
         k = 0
         for i in os.listdir(path):
-            if os.path.isfile(os.path.join(path,i)):
+            if path!=self.targetEnt.get() and os.path.isfile(os.path.join(path,i)):
                 k += 1
-            else:
+            elif os.path.isdir(os.path.join(path, i )):
                 k+= self.countFile(os.path.join(path,i))
         return k
+
+    def listFile(self,path):
+        music = []
+        for i in os.listdir(path):
+            if path!=self.targetEnt.get() and os.path.isfile(os.path.join(path,i)):
+                music.append(os.path.join(path,i))
+            elif os.path.isdir(os.path.join(path,i)):
+                music.extend(self.listFile(os.path.join(path,i)))
+        return music
 
     def copyAll(self,path):
         for i in os.listdir(path):
@@ -74,7 +83,12 @@ class RandoM:
                 self.copyAll(os.path.join(path,i))
 
     def copyRandom(self):
-        pass
+        music = self.listFile(self.originEnt.get())
+        for i in range(int(self.numberEntry.get())):
+            n = int(random()*len(music))
+            print(os.path.basename(music[n]))
+            music.remove(music[n])
+
 
     def click(self):
         if os.path.exists(self.targetEnt.get()) and os.path.exists(self.originEnt.get()):
