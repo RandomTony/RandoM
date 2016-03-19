@@ -7,6 +7,5 @@ The app will generate a random playlist and copy it on your device.
 
 
 ## TO DO
-File browser
-Random file selection
-copy/paste files
++ Random file selection
++ copy/paste files
