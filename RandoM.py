@@ -5,9 +5,14 @@ from tkinter import *
 import shutil
 from tkinter.filedialog import askdirectory
 from random import random
+
+
 class RandoM:
 
     def __init__(self):
+
+        self.extensions = ["flac", "mp3"]
+
         self.frame = Tk()
         self.originText = StringVar()
         self.originLab = Label(self.frame, text="Origin").grid(row=0)
@@ -52,34 +57,34 @@ class RandoM:
 
 
     # remove all the file in the Target directory
-    def removeFiles(self,path):
+    def remove_files(self,path):
         for i in os.listdir(path):
             if os.path.isfile(os.path.join(path,i)):
                 os.remove(os.path.join(path, i))
             else:
-                removeFiles(os.path.join(path,i)) # If you find a new directory, remove it with the files in it
-        if path!=self.targetEnt.get():
+                self.remove_files(os.path.join(path,i)) # If you find a new directory, remove it with the files in it
+        if path != self.targetEnt.get():
             os.rmdir(path)  # Remove directory current directory, except "root"
 
-    def countFile(self,path):
+    def count_file(self,path):
         k = 0
         for i in os.listdir(path):
-            if path!=self.targetEnt.get() and os.path.isfile(os.path.join(path,i)):
+            if path != self.targetEnt.get() and os.path.isfile(os.path.join(path,i)) and i.split(".")[-1] in self.extensions:
                 k += 1
             elif os.path.isdir(os.path.join(path, i )):
-                k+= self.countFile(os.path.join(path,i))
+                k += self.count_file(os.path.join(path,i))
         return k
 
-    def listFile(self,path):
+    def list_file(self, path):
         music = []
         for i in os.listdir(path):
-            if path!=self.targetEnt.get() and os.path.isfile(os.path.join(path,i)):
-                music.append(os.path.join(path,i))
-            elif os.path.isdir(os.path.join(path,i)):
-                music.extend(self.listFile(os.path.join(path,i)))
+            if path != self.targetEnt.get() and os.path.isfile(os.path.join(path, i)) and i.split(".")[-1] in self.extensions:
+                music.append(os.path.join(path, i))
+            elif os.path.isdir(os.path.join(path, i)):
+                music.extend(self.list_file(os.path.join(path, i)))
         return music
 
-    def copyAll(self,path):
+    def copyAll(self, path):
         for i in os.listdir(path):
             if path!=self.targetEnt.get() and os.path.isfile(os.path.join(path,i)):
                 self.stat.set(i)
@@ -90,7 +95,7 @@ class RandoM:
             self.stat.set("Done.")
 
     def copyRandom(self):
-        music = self.listFile(self.originEnt.get())
+        music = self.list_file(self.originEnt.get())
         for i in range(int(self.numberEntry.get())):
             n = int(random()*len(music))
             self.stat.set(os.path.basename(music[n]))
@@ -98,15 +103,15 @@ class RandoM:
             music.remove(music[n])
         self.stat.set("Done.")
 
-
     def click(self):
         if os.path.exists(self.targetEnt.get()) and os.path.exists(self.originEnt.get()):
             origin = self.originEnt.get()
-            target = self.targetEnt.get()
 
-            self.removeFiles(self.targetEnt.get())
+            self.stat.set("Removing files ...")
+            self.remove_files(self.targetEnt.get())
 
-            if self.countFile(origin)<=int(self.numberEntry.get()):
+            self.stat.set("Counting files ...")
+            if self.count_file(origin) <= int(self.numberEntry.get()):
                 self.copyAll(self.originEnt.get())
             else:
                 self.copyRandom()
